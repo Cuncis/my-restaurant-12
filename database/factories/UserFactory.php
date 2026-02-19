@@ -25,21 +25,12 @@ class UserFactory extends Factory
     {
         return [
             'username' => $this->faker->unique()->userName(),
-            'password' => static::$password ?: (static::$password = Hash::make('password')),
+            'password' => bcrypt('password'), // You can use a default password for all users
             'full_name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
             'phone_number' => $this->faker->phoneNumber(),
-            'role_id' => fake()->numberBetween(1, 4), // Assuming you have 3 roles in your roles table
+            'role_id' => fake()->numberBetween(1, 3), // Assuming you have 3 roles in your roles table
         ];
     }
 
-    /**
-     * Indicate that the model's email address should be unverified.
-     */
-    public function unverified(): static
-    {
-        return $this->state(fn(array $attributes) => [
-            'email_verified_at' => null,
-        ]);
-    }
 }
