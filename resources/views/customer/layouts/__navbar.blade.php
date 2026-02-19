@@ -15,8 +15,24 @@
                     <a href="#" class="nav-item nav-link">Kontak</a>
                 </div>
                 <div class="d-flex m-3 me-0">
+                    @php
+                        $cartCount = collect(Session::get('cart', []))->sum('qty');
+                    @endphp
                     <a href="{{ route('cart') }}" class="position-relative me-4 my-auto">
                         <i class="fa fa-shopping-bag fa-2x"></i>
+                        @if ($cartCount > 0)
+                            <span id="cart-count"
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 0.65rem;">
+                                {{ $cartCount }}
+                            </span>
+                        @else
+                            <span id="cart-count"
+                                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                style="font-size: 0.65rem; display: none;">
+                                0
+                            </span>
+                        @endif
                     </a>
                 </div>
             </div>

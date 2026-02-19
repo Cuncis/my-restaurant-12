@@ -9,9 +9,10 @@ Route::get('/', function () {
 
 Route::get('/menu', [MenuController::class, 'index'])->name('menu');
 
-Route::get('/cart', function () {
-    return view('customer.cart');
-})->name('cart');
+Route::get('/cart', [MenuController::class, 'cart'])->name('cart');
+Route::post('/cart/add', [MenuController::class, 'addToCart'])->name('cart.add');
+Route::patch('/cart/update/{id}', [MenuController::class, 'updateCart'])->name('cart.update');
+Route::delete('/cart/remove/{id}', [MenuController::class, 'removeFromCart'])->name('cart.remove');
 
 Route::get('/checkout', function () {
     return view('customer.checkout');

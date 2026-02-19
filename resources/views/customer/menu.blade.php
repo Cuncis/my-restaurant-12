@@ -43,10 +43,10 @@
                                                     <p class="text-dark fs-5 fw-bold mb-0">
                                                         {{ 'Rp' . number_format($item->price, 0, ',', '.') }}
                                                     </p>
-                                                    <a href="#"
-                                                        class="btn border border-secondary rounded-pill px-3 text-primary"><i
-                                                            class="fa fa-shopping-bag me-2 text-primary"></i> Tambah
-                                                        Keranjang</a>
+                                                    <button onclick="addToCart({{ $item->id }})"
+                                                        class="btn border border-secondary rounded-pill px-3 text-primary">
+                                                        <i class="fa fa-shopping-bag me-2 text-primary"></i> Tambah Keranjang
+                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -54,17 +54,17 @@
                                 @endforeach
                                 <!-- Pagination -->
                                 <!-- <div class="col-12">
-                                                                                                <div class="pagination d-flex justify-content-center mt-5">
-                                                                                                    <a href="#" class="rounded">&laquo;</a>
-                                                                                                    <a href="#" class="active rounded">1</a>
-                                                                                                    <a href="#" class="rounded">2</a>
-                                                                                                    <a href="#" class="rounded">3</a>
-                                                                                                    <a href="#" class="rounded">4</a>
-                                                                                                    <a href="#" class="rounded">5</a>
-                                                                                                    <a href="#" class="rounded">6</a>
-                                                                                                    <a href="#" class="rounded">&raquo;</a>
-                                                                                                </div>
-                                                                                            </div> -->
+                                                                                                                                <div class="pagination d-flex justify-content-center mt-5">
+                                                                                                                                    <a href="#" class="rounded">&laquo;</a>
+                                                                                                                                    <a href="#" class="active rounded">1</a>
+                                                                                                                                    <a href="#" class="rounded">2</a>
+                                                                                                                                    <a href="#" class="rounded">3</a>
+                                                                                                                                    <a href="#" class="rounded">4</a>
+                                                                                                                                    <a href="#" class="rounded">5</a>
+                                                                                                                                    <a href="#" class="rounded">6</a>
+                                                                                                                                    <a href="#" class="rounded">&raquo;</a>
+                                                                                                                                </div>
+                                                                                                                            </div> -->
                             </div>
                         </div>
                     </div>
@@ -73,4 +73,55 @@
         </div>
     </div>
     <!-- Fruits Shop End-->
+@endsection
+
+@section('script')
+    <script>
+        function addToCart(menuId) {
+            fetch("{{ route('cart.add') }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ menu_id: menuId })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Update cart badge
+                        const badge = document.getElementById('cart-count');
+                        if (badge) {
+                            badge.textContent = data.cart_count;
+                            badge.style.display = 'inline-block';
+                        }
+                        // Toast-style feedback
+                        showToast('Menu berhasil ditambahkan ke keranjang!');
+                    } else {
+                        showToast('Gagal menambahkan menu ke keranjang.', 'danger');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Terjadi kesalahan saat menambahkan menu.', 'danger');
+                });
+        }
+
+        function showToast(message, type = 'success') {
+            let container = document.getElementById('toast-container');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toast-container';
+                container.style.cssText = 'position:fixed;bottom:1rem;right:1rem;z-index:9999;';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} shadow`;
+            toast.style.cssText = 'min-width:260px;opacity:1;transition:opacity 0.5s;';
+            toast.textContent = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.style.opacity = '0'; }, 2500);
+            setTimeout(() => { toast.remove(); }, 3000);
+        }
+    </script>
 @endsection

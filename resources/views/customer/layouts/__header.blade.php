@@ -29,4 +29,6 @@
 
     <!-- Template Stylesheet -->
     <link href="{{ asset('assets/customer/css/style.css') }}" rel="stylesheet">
+
+    @stack('styles')
 </head>
