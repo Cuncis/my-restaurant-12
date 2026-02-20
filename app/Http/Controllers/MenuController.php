@@ -22,7 +22,8 @@ class MenuController extends Controller
     public function cart()
     {
         $cart = Session::get('cart');
-        return view('customer.cart', compact('cart'));
+        $tableNumber = Session::get('table_number');
+        return view('customer.cart', compact('cart', 'tableNumber'));
     }
 
     public function addToCart(Request $request)
@@ -84,5 +85,11 @@ class MenuController extends Controller
         Session::put('cart', $cart);
 
         return redirect()->route('cart')->with('success', 'Item berhasil dihapus dari keranjang.');
+    }
+
+    public function clearCart()
+    {
+        Session::forget('cart');
+        return redirect()->route('cart')->with('success', 'Keranjang berhasil dikosongkan.');
     }
 }

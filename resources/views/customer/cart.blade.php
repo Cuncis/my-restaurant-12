@@ -24,6 +24,17 @@
                     $total = $subtotal + $tax;
                 @endphp
 
+                <div class="d-flex justify-content-end mb-3">
+                    <form action="{{ route('cart.clear') }}" method="POST"
+                        onsubmit="return confirm('Yakin ingin menghapus semua item dari keranjang?')">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fa fa-trash me-1"></i> Hapus Semua
+                        </button>
+                    </form>
+                </div>
+
                 <div class="table-responsive">
                     <table class="table align-middle">
                         <thead>
@@ -84,6 +95,17 @@
                         <div class="bg-light rounded">
                             <div class="p-4">
                                 <h2 class="display-6 mb-4">Total <span class="fw-normal">Pesanan</span></h2>
+                                @if($tableNumber)
+                                    <div class="d-flex justify-content-between mb-3">
+                                        <h5 class="mb-0 me-4">Nomor Meja</h5>
+                                        <p class="mb-0">
+                                            <a href="{{ url('/menu?table_number=' . $tableNumber) }}"
+                                                class="text-decoration-none fw-semibold">
+                                                Meja {{ $tableNumber }}
+                                            </a>
+                                        </p>
+                                    </div>
+                                @endif
                                 <div class="d-flex justify-content-between mb-4">
                                     <h5 class="mb-0 me-4">Subtotal</h5>
                                     <p class="mb-0" id="summary-subtotal">
@@ -131,8 +153,24 @@
                 return parseInt(priceText.replace(/[^0-9]/g, ''));
             }
 
+            function removeRow() {
+                fetch(`/cart/remove/${id}`, {
+                    method: 'DELETE',
+                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}' }
+                }).then(() => {
+                    row.remove();
+                    recalcSummary();
+                    if (document.querySelectorAll('tr[data-id]').length === 0) {
+                        location.reload();
+                    }
+                });
+            }
+
             function updateRow(qty) {
-                if (qty < 1) qty = 1;
+                if (qty < 1) {
+                    removeRow();
+                    return;
+                }
                 input.value = qty;
                 const price = getPrice();
                 subtotal.innerText = 'Rp' + (price * qty).toLocaleString('id-ID');
