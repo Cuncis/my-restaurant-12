@@ -21,5 +21,6 @@ Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.s
 
 Route::get('/order/success/{id}', function ($id) {
     $order = \App\Models\Order::with(['orderItems.item', 'user'])->findOrFail($id);
-    return view('customer.order-success', compact('order'));
+    $snapToken = session('snap_token');
+    return view('customer.order-success', compact('order', 'snapToken'));
 })->name('order.success');

@@ -133,7 +133,7 @@
                                 <!-- Cashless / E-Wallet -->
                                 <label for="pay_ewallet" class="payment-option flex-fill text-center border rounded p-3"
                                     style="cursor: pointer;">
-                                    <input type="radio" name="payment_method" id="pay_ewallet" value="e_wallet"
+                                    <input type="radio" name="payment_method" id="pay_ewallet" value="midtrans"
                                         class="d-none">
                                     <div class="fs-3 mb-1">📱</div>
                                     <div class="fw-semibold">Cashless</div>

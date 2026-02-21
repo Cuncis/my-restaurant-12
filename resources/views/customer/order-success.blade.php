@@ -97,6 +97,11 @@
                     </div>
 
                     <div class="text-center mt-4">
+                        @if (!empty($snapToken))
+                            <button id="pay-button" class="btn btn-success px-5 py-3 me-2">
+                                <i class="fa fa-credit-card me-2"></i> Bayar Sekarang
+                            </button>
+                        @endif
                         <a href="{{ route('menu') }}" class="btn btn-primary px-5 py-3">
                             <i class="fa fa-utensils me-2"></i> Kembali ke Menu
                         </a>
@@ -109,3 +114,29 @@
     <!-- Order Success Page End -->
 
 @endsection
+
+@if (!empty($snapToken))
+    @section('script')
+        <script src="https://app.sandbox.midtrans.com/snap/snap.js"
+            data-client-key="{{ config('midtrans.client_key') }}"></script>
+        <script>
+            document.getElementById('pay-button').addEventListener('click', function () {
+                snap.pay('{{ $snapToken }}', {
+                    onSuccess: function (result) {
+                        window.location.href = '{{ route('menu') }}';
+                    },
+                    onPending: function (result) {
+                        console.log('Payment pending', result);
+                    },
+                    onError: function (result) {
+                        alert('Pembayaran gagal, silakan coba lagi.');
+                        console.error('Payment error', result);
+                    },
+                    onClose: function () {
+                        console.log('Payment popup closed without finishing.');
+                    }
+                });
+            });
+        </script>
+    @endsection
+@endif
