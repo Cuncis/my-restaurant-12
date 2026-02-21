@@ -5,8 +5,14 @@
     <link rel="stylesheet"
         href="{{ asset('assets/admin/extensions/datatables.net-bs5/css/dataTables.bootstrap5.min.css') }}">
     <style>
-        #table-items img { object-fit: cover; border-radius: 6px; }
-        .dt-search { margin-bottom: 0; }
+        #table-items img {
+            object-fit: cover;
+            border-radius: 6px;
+        }
+
+        .dt-search {
+            margin-bottom: 0;
+        }
     </style>
 @endsection
 
@@ -37,8 +43,7 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-striped table-hover align-middle" id="table-items"
-                                style="width:100%">
+                            <table class="table table-striped table-hover align-middle" id="table-items" style="width:100%">
                                 <thead>
                                     <tr>
                                         <th>#</th>
@@ -56,8 +61,12 @@
                                             <td>{{ $loop->iteration }}</td>
                                             <td>
                                                 @if($item->image_path)
-                                                    <img src="{{ Storage::url($item->image_path) }}"
-                                                        alt="{{ $item->name }}" width="60" height="60">
+                                                    @php
+                                                        $imgSrc = str_starts_with($item->image_path, 'http')
+                                                            ? $item->image_path
+                                                            : Storage::url($item->image_path);
+                                                    @endphp
+                                                    <img src="{{ $imgSrc }}" alt="{{ $item->name }}" width="60" height="60">
                                                 @else
                                                     <div class="d-flex align-items-center justify-content-center bg-light rounded"
                                                         style="width:60px;height:60px;">
@@ -77,16 +86,15 @@
                                             </td>
                                             <td class="text-center">
                                                 <a href="{{ route('items.edit', $item->id) }}"
-                                                    class="btn btn-sm btn-warning me-1"
-                                                    title="Edit">
+                                                    class="btn btn-sm btn-warning me-1" title="Edit">
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </a>
                                                 <form action="{{ route('items.destroy', $item->id) }}" method="POST"
                                                     class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger btn-delete"
-                                                        title="Hapus" data-name="{{ $item->name }}">
+                                                    <button type="submit" class="btn btn-sm btn-danger btn-delete" title="Hapus"
+                                                        data-name="{{ $item->name }}">
                                                         <i class="bi bi-trash-fill"></i>
                                                     </button>
                                                 </form>
@@ -106,10 +114,8 @@
 
 @section('script')
     <script src="{{ asset('assets/admin/extensions/jquery/jquery.min.js') }}"></script>
-    <script
-        src="{{ asset('assets/admin/extensions/datatables.net/js/jquery.dataTables.min.js') }}"></script>
-    <script
-        src="{{ asset('assets/admin/extensions/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
+    <script src="{{ asset('assets/admin/extensions/datatables.net/js/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('assets/admin/extensions/datatables.net-bs5/js/dataTables.bootstrap5.min.js') }}"></script>
     <script>
         $(document).ready(function () {
             $('#table-items').DataTable({

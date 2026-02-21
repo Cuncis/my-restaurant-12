@@ -69,14 +69,45 @@
                             </div>
 
                             <div class="mb-3">
-                                <label for="image" class="form-label fw-semibold">Gambar</label>
-                                <input type="file" name="image" id="image" accept="image/*"
-                                    class="form-control @error('image') is-invalid @enderror"
-                                    onchange="previewImage(this)">
-                                <div class="form-text">Format: JPG, JPEG, PNG, WEBP. Maks 2MB.</div>
-                                @error('image')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <label class="form-label fw-semibold">Gambar</label>
+
+                                {{-- Source toggle --}}
+                                <div class="d-flex gap-2 mb-2">
+                                    <button type="button" class="btn btn-sm btn-primary" id="btn-tab-file"
+                                        onclick="switchTab('file')">
+                                        <i class="bi bi-upload me-1"></i> Upload File
+                                    </button>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" id="btn-tab-url"
+                                        onclick="switchTab('url')">
+                                        <i class="bi bi-link-45deg me-1"></i> URL Gambar
+                                    </button>
+                                </div>
+
+                                {{-- File upload --}}
+                                <div id="tab-file">
+                                    <input type="file" name="image" id="image" accept="image/*"
+                                        class="form-control @error('image') is-invalid @enderror"
+                                        onchange="previewFromFile(this)">
+                                    <div class="form-text">Format: JPG, JPEG, PNG, WEBP. Maks 2MB.</div>
+                                    @error('image')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                {{-- URL input --}}
+                                <div id="tab-url" style="display:none;">
+                                    <input type="url" name="image_url" id="image_url"
+                                        class="form-control @error('image_url') is-invalid @enderror"
+                                        value="{{ old('image_url') }}"
+                                        placeholder="https://example.com/gambar.jpg"
+                                        oninput="previewFromUrl(this.value)">
+                                    <div class="form-text">Masukkan URL gambar yang valid.</div>
+                                    @error('image_url')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                {{-- Preview --}}
                                 <div class="mt-2" id="image-preview-wrapper" style="display:none;">
                                     <img id="image-preview" src="" alt="Preview"
                                         class="rounded" style="height:120px;object-fit:cover;">
@@ -108,19 +139,59 @@
 
 @section('script')
     <script>
-        function previewImage(input) {
-            const wrapper = document.getElementById('image-preview-wrapper');
-            const preview = document.getElementById('image-preview');
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = e => {
-                    preview.src = e.target.result;
-                    wrapper.style.display = 'block';
-                };
-                reader.readAsDataURL(input.files[0]);
+        function switchTab(tab) {
+            const isFile = tab === 'file';
+            document.getElementById('tab-file').style.display = isFile ? 'block' : 'none';
+            document.getElementById('tab-url').style.display  = isFile ? 'none'  : 'block';
+            document.getElementById('btn-tab-file').className = isFile
+                ? 'btn btn-sm btn-primary' : 'btn btn-sm btn-outline-primary';
+            document.getElementById('btn-tab-url').className  = isFile
+                ? 'btn btn-sm btn-outline-primary' : 'btn btn-sm btn-primary';
+            // Clear inactive input
+            if (isFile) {
+                document.getElementById('image_url').value = '';
+                hidePreview();
             } else {
-                wrapper.style.display = 'none';
+                document.getElementById('image').value = '';
+                hidePreview();
             }
         }
+
+        function previewFromFile(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = e => showPreview(e.target.result);
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                hidePreview();
+            }
+        }
+
+        function previewFromUrl(url) {
+            if (url.trim()) {
+                showPreview(url.trim());
+            } else {
+                hidePreview();
+            }
+        }
+
+        function showPreview(src) {
+            document.getElementById('image-preview').src = src;
+            document.getElementById('image-preview-wrapper').style.display = 'block';
+        }
+
+        function hidePreview() {
+            document.getElementById('image-preview-wrapper').style.display = 'none';
+            document.getElementById('image-preview').src = '';
+        }
+
+        // Auto-switch to URL tab if old input was a URL
+        document.addEventListener('DOMContentLoaded', function () {
+            const urlVal = document.getElementById('image_url').value;
+            if (urlVal) {
+                switchTab('url');
+                showPreview(urlVal);
+            }
+        });
     </script>
 @endsection

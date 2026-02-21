@@ -38,6 +38,7 @@ class ItemController extends Controller
             'price' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image_url' => 'nullable|url|max:2048',
             'is_available' => 'boolean',
         ]);
 
@@ -45,6 +46,8 @@ class ItemController extends Controller
 
         if ($request->hasFile('image')) {
             $validated['image_path'] = $request->file('image')->store('items', 'public');
+        } elseif ($request->filled('image_url')) {
+            $validated['image_path'] = $request->input('image_url');
         }
 
         Item::create($validated);
@@ -84,17 +87,24 @@ class ItemController extends Controller
             'price' => 'required|integer|min:0',
             'category_id' => 'required|exists:categories,id',
             'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'image_url' => 'nullable|url|max:2048',
             'is_available' => 'boolean',
         ]);
 
         $validated['is_available'] = $request->boolean('is_available');
 
         if ($request->hasFile('image')) {
-            // Delete old image if exists
-            if ($item->image_path) {
+            // Delete old stored file (not if it was a URL)
+            if ($item->image_path && !str_starts_with($item->image_path, 'http')) {
                 Storage::disk('public')->delete($item->image_path);
             }
             $validated['image_path'] = $request->file('image')->store('items', 'public');
+        } elseif ($request->filled('image_url')) {
+            // Delete old stored file if switching to URL
+            if ($item->image_path && !str_starts_with($item->image_path, 'http')) {
+                Storage::disk('public')->delete($item->image_path);
+            }
+            $validated['image_path'] = $request->input('image_url');
         }
 
         $item->update($validated);
