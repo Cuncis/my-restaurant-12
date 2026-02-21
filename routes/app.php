@@ -31,10 +31,16 @@ Route::get('/order/success/{id}', function ($id) {
     return view('customer.order-success', compact('order', 'snapToken'));
 })->name('order.success');
 
-// Admin routes
-Route::resource('/dashboard', DashboardController::class);
-Route::resource('/categories', CategoryController::class);
-Route::resource('/items', ItemController::class);
-Route::resource('/roles', RoleController::class);
-Route::resource('/users', UserController::class);
-Route::resource('/orders', OrderController::class);
+// Admin routes — require login + allowed roles
+Route::middleware(['auth', 'role:Admin,Cashier,Chef'])->group(function () {
+    Route::resource('/dashboard', DashboardController::class);
+    Route::resource('/orders', OrderController::class);
+
+    // Admin-only management routes
+    Route::middleware('role:Admin')->group(function () {
+        Route::resource('/categories', CategoryController::class);
+        Route::resource('/items', ItemController::class);
+        Route::resource('/roles', RoleController::class);
+        Route::resource('/users', UserController::class);
+    });
+});

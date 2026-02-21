@@ -62,6 +62,7 @@
             </div>
         @endauth
         <div class="sidebar-menu">
+            @php $role = auth()->user()->role->name ?? ''; @endphp
             <ul class="menu">
                 <li class="sidebar-title"><strong>Menu</strong></li>
 
@@ -72,41 +73,50 @@
                     </a>
                 </li>
 
-                <li class="sidebar-title"><strong>Manajemen Data</strong></li>
+                @if($role === 'Admin')
+                    <li class="sidebar-title"><strong>Manajemen Data</strong></li>
 
-                <li class="sidebar-item {{ request()->routeIs('categories.*') ? 'active' : '' }}">
-                    <a href="{{ route('categories.index') }}" class='sidebar-link'>
-                        <i class="bi bi-tags-fill"></i>
-                        <span>Kategori</span>
-                    </a>
-                </li>
-                <li class="sidebar-item {{ request()->routeIs('items.*') ? 'active' : '' }}">
-                    <a href="{{ route('items.index') }}" class='sidebar-link'>
-                        <i class="bi bi-egg-fried"></i>
-                        <span>Menu Makanan</span>
-                    </a>
-                </li>
-                <li class="sidebar-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
-                    <a href="{{ route('orders.index') }}" class='sidebar-link'>
-                        <i class="bi bi-receipt-cutoff"></i>
-                        <span>Pesanan</span>
-                    </a>
-                </li>
+                    <li class="sidebar-item {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                        <a href="{{ route('categories.index') }}" class='sidebar-link'>
+                            <i class="bi bi-tags-fill"></i>
+                            <span>Kategori</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item {{ request()->routeIs('items.*') ? 'active' : '' }}">
+                        <a href="{{ route('items.index') }}" class='sidebar-link'>
+                            <i class="bi bi-egg-fried"></i>
+                            <span>Menu Makanan</span>
+                        </a>
+                    </li>
+                @endif
 
-                <li class="sidebar-title"><strong>Akses & Pengguna</strong></li>
+                @if(in_array($role, ['Admin', 'Cashier', 'Chef']))
+                    <li class="sidebar-title"><strong>Transaksi</strong></li>
 
-                <li class="sidebar-item {{ request()->routeIs('roles.*') ? 'active' : '' }}">
-                    <a href="{{ route('roles.index') }}" class='sidebar-link'>
-                        <i class="bi bi-shield-fill"></i>
-                        <span>Role</span>
-                    </a>
-                </li>
-                <li class="sidebar-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
-                    <a href="{{ route('users.index') }}" class='sidebar-link'>
-                        <i class="bi bi-people-fill"></i>
-                        <span>Pengguna</span>
-                    </a>
-                </li>
+                    <li class="sidebar-item {{ request()->routeIs('orders.*') ? 'active' : '' }}">
+                        <a href="{{ route('orders.index') }}" class='sidebar-link'>
+                            <i class="bi bi-receipt-cutoff"></i>
+                            <span>Pesanan</span>
+                        </a>
+                    </li>
+                @endif
+
+                @if($role === 'Admin')
+                    <li class="sidebar-title"><strong>Akses & Pengguna</strong></li>
+
+                    <li class="sidebar-item {{ request()->routeIs('roles.*') ? 'active' : '' }}">
+                        <a href="{{ route('roles.index') }}" class='sidebar-link'>
+                            <i class="bi bi-shield-fill"></i>
+                            <span>Role</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-item {{ request()->routeIs('users.*') ? 'active' : '' }}">
+                        <a href="{{ route('users.index') }}" class='sidebar-link'>
+                            <i class="bi bi-people-fill"></i>
+                            <span>Pengguna</span>
+                        </a>
+                    </li>
+                @endif
 
                 <li class="sidebar-title"><strong>Akun</strong></li>
 

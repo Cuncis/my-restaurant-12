@@ -13,8 +13,24 @@ class RoleMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next, string ...$roles): Response
     {
+        if (!$request->user()) {
+            return redirect()->route('login');
+        }
+
+        $userRole = $request->user()->role->name ?? null;
+
+        if (!in_array($userRole, $roles)) {
+            // Customers go back to the menu, others see 403
+            if ($userRole === 'Customer') {
+                return redirect()->route('menu')
+                    ->with('error', 'Anda tidak memiliki akses ke halaman admin.');
+            }
+
+            abort(403, 'Akses ditolak.');
+        }
+
         return $next($request);
     }
 }
