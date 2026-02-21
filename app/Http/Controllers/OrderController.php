@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 
 class OrderController extends Controller
 {
@@ -11,15 +13,21 @@ class OrderController extends Controller
      */
     public function index()
     {
-        //
+        $orders = Order::with('user')
+            ->withCount('orderItems')
+            ->latest()
+            ->get();
+
+        return view('admin.order.index', compact('orders'));
     }
 
     /**
      * Show the form for creating a new resource.
+     * Orders are created from the customer side; redirect to index.
      */
     public function create()
     {
-        //
+        return redirect()->route('orders.index');
     }
 
     /**
@@ -27,7 +35,7 @@ class OrderController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        return redirect()->route('orders.index');
     }
 
     /**
@@ -35,7 +43,10 @@ class OrderController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $order = Order::with(['user', 'orderItems.item'])
+            ->findOrFail($id);
+
+        return view('admin.order.show', compact('order'));
     }
 
     /**
@@ -43,7 +54,10 @@ class OrderController extends Controller
      */
     public function edit(string $id)
     {
-        //
+        $order = Order::with(['user', 'orderItems.item'])
+            ->findOrFail($id);
+
+        return view('admin.order.edit', compact('order'));
     }
 
     /**
@@ -51,7 +65,15 @@ class OrderController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $request->validate([
+            'status' => 'required|in:pending,settlement,cooked',
+        ]);
+
+        $order = Order::findOrFail($id);
+        $order->update(['status' => $request->status]);
+
+        return redirect()->route('orders.show', $order->id)
+            ->with('success', 'Status pesanan berhasil diperbarui.');
     }
 
     /**
@@ -59,6 +81,10 @@ class OrderController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $order = Order::findOrFail($id);
+        $order->delete();
+
+        return redirect()->route('orders.index')
+            ->with('success', 'Pesanan berhasil dihapus.');
     }
 }
