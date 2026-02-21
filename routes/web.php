@@ -1,7 +1,13 @@
 <?php
 
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\MenuController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -24,3 +30,11 @@ Route::get('/order/success/{id}', function ($id) {
     $snapToken = session('snap_token');
     return view('customer.order-success', compact('order', 'snapToken'));
 })->name('order.success');
+
+// Admin routes
+Route::resource('/dashboard', DashboardController::class);
+Route::resource('/categories', CategoryController::class);
+Route::resource('/items', ItemController::class);
+Route::resource('/roles', RoleController::class);
+Route::resource('/users', UserController::class);
+Route::resource('/orders', OrderController::class);
